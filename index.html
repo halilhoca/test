@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Okey Puan</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            padding: 15px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .player-input-table {
+            width: 100%;
+            margin-bottom: 8px;
+            border-collapse: collapse;
+        }
+
+        .player-input-table td {
+            padding: 8px;
+        }
+
+        .player-name {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .score-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            -webkit-appearance: none;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            touch-action: manipulation;
+        }
+
+        button.reset {
+            background: #dc3545;
+        }
+
+        button.edit {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .history {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .round-actions {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .round-actions button {
+            padding: 5px;
+            font-size: 12px;
+            width: auto;
+        }
+
+        .totals {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .total-box {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .total-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #007bff;
+            margin-top: 5px;
+        }
+
+        @media (min-width: 768px) {
+            .totals {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .edit-dialog {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-dialog-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .edit-dialog h3 {
+            margin-bottom: 15px;
+        }
+
+        .edit-dialog-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🀄 Okey Skor</h1>
+        </div>
+
+        <div class="input-group">
+            <table class="player-input-table">
+                <tr>
+                    <td width="60%">Oyuncu</td>
+                    <td width="40%">Puan</td>
+                </tr>
+                <tr>
+                    <td><input type="text" class="player-name" id="name1" placeholder="Oyuncu 1"></td>
+                    <td><input type="number" class="score-input" id="score1" placeholder="Puan"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" class="player-name" id="name2" placeholder="Oyuncu 2"></td>
+                    <td><input type="number" class="score-input" id="score2" placeholder="Puan"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" class="player-name" id="name3" placeholder="Oyuncu 3"></td>
+                    <td><input type="number" class="score-input" id="score3" placeholder="Puan"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" class="player-name" id="name4" placeholder="Oyuncu 4"></td>
+                    <td><input type="number" class="score-input" id="score4" placeholder="Puan"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="buttons">
+            <button onclick="addRound()">Puan Ekle</button>
+            <button class="reset" onclick="resetGame()">Sıfırla</button>
+        </div>
+
+        <div class="history">
+            <h3>Geçmiş</h3>
+            <div id="historyTable"></div>
+        </div>
+
+        <div class="totals" id="totalSection"></div>
+    </div>
+
+    <div class="edit-dialog" id="editDialog">
+        <div class="edit-dialog-content">
+            <h3>Puan Düzenle</h3>
+            <div id="editForm"></div>
+            <div class="edit-dialog-buttons">
+                <button onclick="closeEditDialog()">İptal</button>
+                <button onclick="saveEdit()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let rounds = [];
+        let totals = [0, 0, 0, 0];
+        let playerNames = ['Oyuncu 1', 'Oyuncu 2', 'Oyuncu 3', 'Oyuncu 4'];
+        let currentEditIndex = -1;
+
+        // Sayfa yüklendiğinde localStorage'dan verileri al
+        function loadFromStorage() {
+            const savedRounds = localStorage.getItem('okeyRounds');
+            const savedTotals = localStorage.getItem('okeyTotals');
+            const savedNames = localStorage.getItem('okeyNames');
+
+            if (savedRounds) rounds = JSON.parse(savedRounds);
+            if (savedTotals) totals = JSON.parse(savedTotals);
+            if (savedNames) {
+                playerNames = JSON.parse(savedNames);
+                for (let i = 0; i < 4; i++) {
+                    document.getElementById(`name${i+1}`).value = playerNames[i];
+                }
+            }
+        }
+
+        // Verileri localStorage'a kaydet
+        function saveToStorage() {
+            localStorage.setItem('okeyRounds', JSON.stringify(rounds));
+            localStorage.setItem('okeyTotals', JSON.stringify(totals));
+            localStorage.setItem('okeyNames', JSON.stringify(playerNames));
+        }
+
+        function updateDisplay() {
+            // İsimleri güncelle
+            playerNames = Array.from({length:4}, (_,i) => 
+                document.getElementById(`name${i+1}`).value || `Oyuncu ${i+1}`);
+
+            // Toplamları güncelle
+            document.getElementById('totalSection').innerHTML = totals.map((total, index) => `
+                <div class="total-box">
+                    <div>${playerNames[index]}</div>
+                    <div class="total-value">${total}</div>
+                </div>
+            `).join('');
+
+            // Geçmişi güncelle
+            document.getElementById('historyTable').innerHTML = `
+                <table>
+                    <tr>
+                        <th>Tur</th>
+                        ${playerNames.map(name => `<th>${name}</th>`).join('')}
+                        <th>İşlem</th>
+                    </tr>
+                    ${rounds.map((round, i) => `
+                        <tr>
+                            <td>${i+1}</td>
+                            ${round.scores.map(score => `<td>${score}</td>`).join('')}
+                            <td class="round-actions">
+                                <button class="edit" onclick="editRound(${i})">Düzenle</button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </table>
+            `;
+
+            // localStorage'a kaydet
+            saveToStorage();
+        }
+
+        function addRound() {
+            const scores = [];
+            let error = false;
+
+            for(let i=1; i<=4; i++) {
+                const score = document.getElementById(`score${i}`).value;
+                if(!score) {
+                    document.getElementById(`score${i}`).style.borderColor = '#dc3545';
+                    error = true;
+                } else {
+                    document.getElementById(`score${i}`).style.borderColor = '#e9ecef';
+                    scores.push(parseInt(score));
+                }
+            }
+
+            if(error) {
+                alert('Lütfen tüm puanları girin!');
+                return;
+            }
+
+            totals = totals.map((total, index) => total + scores[index]);
+            rounds.push({ scores });
+            
+            updateDisplay();
+            document.querySelectorAll('.score-input').forEach(input => input.value = '');
+        }
+
+        function resetGame() {
+            if (confirm("Oyunu sıfırlamak istediğinize emin misiniz? Tüm puanlar silinecek.")) {
+                rounds = [];
+                totals = [0, 0, 0, 0];
+                updateDisplay();
+            }
+        }
+
+        function editRound(index) {
+            currentEditIndex = index;
+            const round = rounds[index];
+            
+            let formHtml = `
+                <table class="player-input-table">
+                    <tr>
+                        <td>Oyuncu</td>
+                        <td>Puan</td>
+                    </tr>
+            `;
+            
+            for (let i = 0; i < 4; i++) {
+                formHtml += `
+                    <tr>
+                        <td>${playerNames[i]}</td>
+                        <td><input type="number" class="score-input" id="edit-score${i}" value="${round.scores[i]}"></td>
+                    </tr>
+                `;
+            }
+            
+            formHtml += `</table>`;
+            document.getElementById('editForm').innerHTML = formHtml;
+            document.getElementById('editDialog').style.display = 'flex';
+        }
+
+        function closeEditDialog() {
+            document.getElementById('editDialog').style.display = 'none';
+        }
+
+        function saveEdit() {
+            if (currentEditIndex < 0) return;
+            
+            const oldScores = rounds[currentEditIndex].scores;
+            const newScores = [];
+            let error = false;
+
+            for(let i=0; i<4; i++) {
+                const score = document.getElementById(`edit-score${i}`).value;
+                if(!score) {
+                    error = true;
+                    break;
+                } else {
+                    newScores.push(parseInt(score));
+                }
+            }
+
+            if(error) {
+                alert('Lütfen tüm puanları girin!');
+                return;
+            }
+
+            // Eskiden eklenmiş puanları çıkar
+            totals = totals.map((total, index) => total - oldScores[index]);
+            
+            // Yeni puanları ekle
+            totals = totals.map((total, index) => total + newScores[index]);
+            
+            // Round güncelle
+            rounds[currentEditIndex].scores = newScores;
+            
+            updateDisplay();
+            closeEditDialog();
+        }
+
+        // İsim değişikliklerini takip et
+        document.querySelectorAll('.player-name').forEach(input => {
+            input.addEventListener('input', updateDisplay);
+        });
+
+        // Sayfa yüklendiğinde kayıtlı verileri yükle
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFromStorage();
+            updateDisplay();
+        });
+    </script>
+</body>
+</html>
