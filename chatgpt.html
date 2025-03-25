@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ödev Takip Uygulaması</title>
+    <style>
+        /* Genel Stil */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #007bff;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-top: 0;
+        }
+
+        /* Form Stilleri */
+        .form-container {
+            margin-bottom: 20px;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus, button:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .save-btn {
+            background-color: #28a745;
+        }
+
+        .save-btn:hover {
+            background-color: #218838;
+        }
+
+        /* Ödev Listesi Stilleri */
+        .assignment-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .assignment-list li {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .assignment-list li:hover {
+            background-color: #f9f9f9;
+        }
+
+        .assignment-list li button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background-color: #dc3545;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .assignment-list li button:hover {
+            background-color: #c82333;
+        }
+
+        /* Mobil Uyumlu Stil */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+
+            h2 {
+                font-size: 18px;
+            }
+
+            input, select, button {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            .assignment-list li {
+                font-size: 14px;
+            }
+
+            .assignment-list li button {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ödev Takip Uygulaması</h1>
+        
+        <!-- Kitap Ekleme Formu -->
+        <div class="form-container">
+            <h2>Kitap Ekle</h2>
+            <input type="text" id="bookName" placeholder="Kitap Adı">
+            <button onclick="addBook()">Kitap Ekle</button>
+        </div>
+
+        <!-- Ödev Programı Formu -->
+        <div class="form-container">
+            <h2>Ödev Programı Oluştur</h2>
+            <select id="bookList"></select>
+            <input type="text" id="pageRange" placeholder="Sayfa Aralığı (Örn: 10-15)">
+            <button onclick="addAssignment()">Ödev Ekle</button>
+        </div>
+
+        <!-- Kaydet Butonu -->
+        <button onclick="saveProgram()" class="save-btn">Programı Kaydet</button>
+
+        <!-- Ödev Listesi -->
+        <div class="assignment-list">
+            <h2>Ödev Programı</h2>
+            <ul id="assignmentList"></ul>
+        </div>
+    </div>
+
+    <script>
+        let books = [];
+        let assignments = [];
+
+        function addBook() {
+            const bookName = document.getElementById('bookName').value;
+            if (bookName) {
+                books.push(bookName);
+                updateBookList();
+                document.getElementById('bookName').value = '';
+            }
+        }
+
+        function updateBookList() {
+            const bookList = document.getElementById('bookList');
+            bookList.innerHTML = '';
+            books.forEach(book => {
+                const option = document.createElement('option');
+                option.value = book;
+                option.textContent = book;
+                bookList.appendChild(option);
+            });
+        }
+
+        function addAssignment() {
+            const book = document.getElementById('bookList').value;
+            const pageRange = document.getElementById('pageRange').value;
+            if (book && pageRange) {
+                assignments.push({ book, pageRange, completed: false });
+                updateAssignmentList();
+                document.getElementById('pageRange').value = '';
+            }
+        }
+
+        function updateAssignmentList() {
+            const assignmentList = document.getElementById('assignmentList');
+            assignmentList.innerHTML = '';
+            assignments.forEach((assignment, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${assignment.book} - Sayfalar: ${assignment.pageRange}`;
+                
+                const doneButton = document.createElement('button');
+                doneButton.textContent = assignment.completed ? 'Yapıldı' : 'Yapılmadı';
+                doneButton.onclick = () => toggleCompletion(index);
+                
+                li.appendChild(doneButton);
+                assignmentList.appendChild(li);
+            });
+        }
+
+        function toggleCompletion(index) {
+            assignments[index].completed = !assignments[index].completed;
+            updateAssignmentList();
+        }
+
+        function saveProgram() {
+            const program = JSON.stringify(assignments);
+            localStorage.setItem('homeworkProgram', program);
+            alert('Program kaydedildi!');
+        }
+
+        function loadProgram() {
+            const program = localStorage.getItem('homeworkProgram');
+            if (program) {
+                assignments = JSON.parse(program);
+                updateAssignmentList();
+            }
+        }
+
+        // Sayfa yüklendiğinde kayıtlı programı yükle
+        window.onload = loadProgram;
+    </script>
+</body>
+</html>
